@@ -7,5 +7,5 @@ import { dataSource } from './shared/infra/typeorm/index';
 config();
 
 dataSource.initialize().then(() => {
-  app.listen(7003, () => console.log('Server started on port 7003.'));
+  app.listen(3333, () => console.log('Server started on port 3333.'));
 });
