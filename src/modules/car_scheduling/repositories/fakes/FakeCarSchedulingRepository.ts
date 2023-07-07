@@ -34,18 +34,15 @@ export class FakeCarSchedulingRepository implements ICarSchedulingRepository {
 
 
   async create(car_scheduling: ICreateCarSchedulingDTO): Promise<CarScheduling> {
-    const carSchedulingToCreate: CarScheduling = {
+    const carSchedulingToCreate = new CarScheduling();
+
+    Object.assign( carSchedulingToCreate,{
       id: uuid(),
-      created_at: new Date(),
-      updated_at: new Date(),
       end_date_of_use: car_scheduling.end_date_of_use,
       reason_for_use: car_scheduling.reason_for_use,
-      start_date_of_use: new Date(),
       car_id: car_scheduling.car_id,
       driver_id: car_scheduling.driver_id,
-      car: new Car(),
-      driver: new Driver(),
-    }
+    });
 
     this.fakeCarSchedulingRepository.push(carSchedulingToCreate);
 

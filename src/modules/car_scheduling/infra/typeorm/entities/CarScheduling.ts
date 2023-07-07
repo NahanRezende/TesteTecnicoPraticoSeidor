@@ -3,7 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
-  OneToOne,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -27,14 +27,14 @@ export class CarScheduling {
   @Column()
   driver_id: string;
 
-  @OneToOne(() => Driver)
+  @ManyToOne(() => Driver)
   @JoinColumn({ name: 'driver_id' })
   driver: Driver;
 
   @Column()
   car_id: string;
 
-  @OneToOne(() => Car)
+  @ManyToOne(() => Car)
   @JoinColumn({ name: 'car_id' })
   car: Car;
 

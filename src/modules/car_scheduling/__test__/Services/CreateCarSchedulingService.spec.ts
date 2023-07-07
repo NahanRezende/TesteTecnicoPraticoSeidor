@@ -1,34 +1,55 @@
+import { FakeCarRepository } from '@modules/car/repositories/fakes/FakeCarRepository';
+import { ICarRepository } from '@modules/car/repositories/ICarRepository';
 import { ICreateCarSchedulingDTO } from '@modules/car_scheduling/dtos/ICreateCarSchedulingDTO';
 import { FakeCarSchedulingRepository } from '@modules/car_scheduling/repositories/fakes/FakeCarSchedulingRepository';
 import { ICarSchedulingRepository } from '@modules/car_scheduling/repositories/ICarSchedulingRepository';
 import { CreateCarSchedulingService } from '@modules/car_scheduling/services/CreateCarSchedulingService';
+import { FakeDriverRepository } from '@modules/driver/repositories/fakes/FakeDriverRepository';
+import { IDriverRepository } from '@modules/driver/repositories/IDriverRepository';
 import AppError from '@shared/errors/AppError';
 
 describe('Create car scheduling service test', () => {
+  let fakeCarRepository: ICarRepository;
+  let fakeCarSchedulinRepository: ICarSchedulingRepository;
+  let fakeDriverRepository: IDriverRepository;
+
+
   let createCarSchedulingService: CreateCarSchedulingService;
 
-  let fakeCarSchedulinRepository: ICarSchedulingRepository;
-
   beforeAll(() => {
-    fakeCarSchedulinRepository = new FakeCarSchedulingRepository([{
-      reason_for_use:'test1',
-      car_id: 'test1',
-      driver_id:'test1',
-    }]);
+    fakeCarRepository = new FakeCarRepository();
+    fakeDriverRepository = new FakeDriverRepository();
+    fakeCarSchedulinRepository = new FakeCarSchedulingRepository();
 
     createCarSchedulingService = new CreateCarSchedulingService(fakeCarSchedulinRepository);
   });
 
   afterEach(async () => {
+    fakeCarRepository = new FakeCarRepository();
+    fakeDriverRepository = new FakeDriverRepository();
+    fakeCarSchedulinRepository = new FakeCarSchedulingRepository();
+
     fakeCarSchedulinRepository = new FakeCarSchedulingRepository();
   });
 
   it('Should not be able to create a car scheduling to a driver who aready have a scheduling', async () => {
     try {
+      const driver = await fakeDriverRepository.create('teste1');
+
+      const car = await fakeCarRepository.create({ brand: 'teste1', color: 'teste1', license_plate: 'teste1'});
+
+      const carScheduling = {
+        reason_for_use:'test1',
+        car_id: car.id,
+        driver_id: driver.id,
+      };
+
+      await fakeCarSchedulinRepository.create(carScheduling);
+
       const carScheduling1: ICreateCarSchedulingDTO = {
         reason_for_use:'test1',
-        car_id: 'test1',
-        driver_id:'test1',
+        car_id: car.id,
+        driver_id: driver.id,
       }
 
       await createCarSchedulingService.execute(carScheduling1);
@@ -45,13 +66,27 @@ describe('Create car scheduling service test', () => {
 
   it('Should not be able to create a car scheduling with a car who aready have a scheduling', async () => {
     try {
+      const driver1 = await fakeDriverRepository.create('teste1');
+      const driver2 = await fakeDriverRepository.create('teste2');
+
+      const car = await fakeCarRepository.create({ brand: 'teste1', color: 'teste1', license_plate: 'teste1'});
+
+      const carScheduling = {
+        reason_for_use:'test1',
+        car_id: car.id,
+        driver_id: driver1.id,
+      };
+
+      await createCarSchedulingService.execute(carScheduling);
+
       const carScheduling1: ICreateCarSchedulingDTO = {
         reason_for_use:'test1',
-        car_id: 'test1',
-        driver_id:'test2',
+        car_id: car.id,
+        driver_id: driver2.id,
       }
 
-      await createCarSchedulingService.execute(carScheduling1);
+      const teste = await createCarSchedulingService.execute(carScheduling1);
+      console.log(teste);
 
       expect(true).toEqual(false);
     } catch (error) {

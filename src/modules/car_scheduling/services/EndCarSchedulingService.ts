@@ -11,12 +11,12 @@ export class EndCarSchedulingService {
   ) {}
 
   async execute(driver_id: string): Promise<CarScheduling>{
-    const carScheduling = await this.carSchedulingRepository.findByDriverId(driver_id);
+    const carSchedulingArray = await this.carSchedulingRepository.findByDriverId(driver_id);
 
     let carSchedulingToUpdate: CarScheduling;
 
-    if(carScheduling.length >= 0){
-      carSchedulingToUpdate = carScheduling.find(carScheduling => carScheduling.end_date_of_use === undefined);
+    if(carSchedulingArray.length >= 0){
+      carSchedulingToUpdate = carSchedulingArray.find(carScheduling => carScheduling.end_date_of_use === null || carScheduling.end_date_of_use === undefined);
 
       if(!carSchedulingToUpdate){
         throw new AppError('There is no Car Schedule to end!', undefined, 'end_car_scheduling');
